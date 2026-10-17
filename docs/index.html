@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Parking Cloud IoT Hub</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Firebase App & Realtime Database SDKs (Compat for maximum reliability) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="title-row">
+        <h1>☁️ Smart Parking Cloud Hub</h1>
+        <div id="cloud-pill" class="status-pill pill-online">
+          <span class="dot"></span> <span id="cloud-text">CONNECTING...</span>
+        </div>
+      </div>
+      <p class="subtitle">Real-time Global IoT Telemetry & Barrier Gate Remote</p>
+    </header>
+
+    <!-- Parking Status Banner -->
+    <div id="banner" class="status-banner banner-ok">CHECKING PARKING SLOTS...</div>
+
+    <!-- Live Metrics Grid -->
+    <div class="grid grid-3">
+      <div class="card metric-card">
+        <div class="label">Available</div>
+        <div id="avail" class="value val-avail">--</div>
+      </div>
+      <div class="card metric-card">
+        <div class="label">Occupied</div>
+        <div id="occ" class="value val-occ">--</div>
+      </div>
+      <div class="card metric-card">
+        <div class="label">Capacity</div>
+        <div id="total" class="value val-total">20</div>
+      </div>
+    </div>
+
+    <!-- Occupancy Progress Bar -->
+    <div class="card progress-card">
+      <div class="progress-header">
+        <span>Real-Time Occupancy</span>
+        <span id="cap-text">0 / 20 Slots</span>
+      </div>
+      <div class="progress-track">
+        <div id="bar" class="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Cloud Gate Actuators -->
+    <section class="section-title">Cloud Barrier Gate Remote</section>
+    
+    <div class="grid grid-2">
+      <!-- Entry Gate Card -->
+      <div class="card gate-card">
+        <div class="gate-header">
+          <h3>Entry Barrier</h3>
+          <span id="entry-badge" class="badge badge-closed">CLOSED</span>
+        </div>
+        <p class="gate-hint">Actuates ESP32 GPIO 14 via Cloud</p>
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="sendGateCommand('entry', 'pulse')">
+            🟢 Open (3s Auto-Close)
+          </button>
+          <div class="btn-subgroup">
+            <button class="btn btn-outline" onclick="sendGateCommand('entry', 'open')">Hold Open</button>
+            <button class="btn btn-outline btn-danger" onclick="sendGateCommand('entry', 'close')">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exit Gate Card -->
+      <div class="card gate-card">
+        <div class="gate-header">
+          <h3>Exit Barrier</h3>
+          <span id="exit-badge" class="badge badge-closed">CLOSED</span>
+        </div>
+        <p class="gate-hint">Actuates ESP32 GPIO 13 via Cloud</p>
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="sendGateCommand('exit', 'pulse')">
+            🟢 Open (3s Auto-Close)
+          </button>
+          <div class="btn-subgroup">
+            <button class="btn btn-outline" onclick="sendGateCommand('exit', 'open')">Hold Open</button>
+            <button class="btn btn-outline btn-danger" onclick="sendGateCommand('exit', 'close')">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Counter Adjustments -->
+    <section class="section-title">Manual Slot Overrides</section>
+    <div class="card control-card">
+      <div class="button-row">
+        <button class="btn btn-secondary" onclick="sendSlotCommand('inc')">
+          ➕ Manual Entry (+1)
+        </button>
+        <button class="btn btn-secondary" onclick="sendSlotCommand('dec')">
+          ➖ Manual Exit (-1)
+        </button>
+        <button class="btn btn-danger" onclick="resetSlots()">
+          🔄 Reset All (0)
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Event Log -->
+    <section class="section-title">Live Cloud Event Stream</section>
+    <div class="card log-card">
+      <ul id="event-log">
+        <li class="log-entry">Connecting to Firebase Realtime Cloud...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

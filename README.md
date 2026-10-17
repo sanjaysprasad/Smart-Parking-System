@@ -124,17 +124,37 @@ The ESP32 broadcasts its own Wi-Fi Access Point (SoftAP):
 
 ## 🎮 Choosing Your Firmware Sketch
 
-The repository includes two versions:
+The repository includes three versions to fit every deployment scenario:
 
 1. **[`SmartPark.ino`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark.ino) (Standard Automated Mode):**
-   - Autonomous IR sensing, auto-opening barrier servos, LCD updates, and read-only live web telemetry.
+   - Autonomous IR sensing, auto-opening barrier servos, LCD updates, and read-only live web telemetry via ESP32 SoftAP (`192.168.4.1`).
    - Self-contained single-file sketch.
 
-2. **[`SmartPark_WebControl/`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark_WebControl/SmartPark_WebControl.ino) (Interactive Web App & Control):**
-   - Adds full bidirectional remote control over Wi-Fi (Hold open, 3s Pulse, Close, and manual counter adjustments).
+2. **[`SmartPark_WebControl/`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark_WebControl/SmartPark_WebControl.ino) (Local Web App & LittleFS Remote):**
+   - Bidirectional remote control over local Wi-Fi (Hold open, 3s Pulse, Close, and manual counter adjustments).
    - Serves separated web files (`index.html`, `style.css`, `app.js`) from ESP32 **LittleFS** flash memory.
-   - Auto-formats and auto-seeds the web files on first boot if LittleFS is empty.
-   - Includes an IP configuration bar so the web app can also be opened standalone from any computer or browser and connect to `http://192.168.4.1`.
+   - Includes standalone IP input for direct browser testing.
+
+3. **[`SmartPark_Firebase/`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark_Firebase/SmartPark_Firebase.ino) (True Cloud IoT Mode — Worldwide Access):**
+   - Connects to your Home/Office/Hotspot Wi-Fi and synchronizes with **Google Firebase Realtime Database**.
+   - Bi-directional cloud control: control barrier gates and monitor slots from **anywhere in the world** over 4G/5G/cellular data.
+   - Uses zero external third-party Firebase libraries (native HTTPS REST for maximum stability and easy compilation).
+   - Paired with the live Web App in [`docs/`](file:///Users/ssp/Documents/Arduino/SmartPark/docs/index.html) hosted on GitHub Pages.
+
+---
+
+## 🚀 Live Cloud Web App (GitHub Pages)
+
+The cloud dashboard in the [`docs/`](file:///Users/ssp/Documents/Arduino/SmartPark/docs/) folder is ready for 1-click publishing:
+
+1. In your GitHub repository, go to **Settings** ➔ **Pages** (under Code and automation).
+2. Under **Build and deployment** > **Branch**:
+   - Select **`main`** branch.
+   - Select folder **`/docs`**.
+   - Click **Save**.
+3. In ~60 seconds, your dashboard is live at:
+   **`https://sanjaysprasad.github.io/Smart-Parking-System/`**
+4. Open the link on any phone, tablet, or PC to monitor the parking lot and actuate gates globally!
 
 ---
 
