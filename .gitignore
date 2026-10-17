@@ -1,0 +1,14 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Arduino / IDE build artifacts
+build/
+*.bin
+*.hex
+*.elf
+
+# VS Code / PlatformIO
+.vscode/
+.pio/
