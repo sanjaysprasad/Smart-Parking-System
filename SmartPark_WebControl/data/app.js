@@ -4,7 +4,7 @@ let lastStatus = null;
 let pollTimer = null;
 
 // Default Admin Authentication PIN (Can be changed anytime)
-const ADMIN_PIN = "admin123";
+const ADMIN_PIN = "admin@marichinthikuka";
 
 // Determine if running standalone or directly from ESP32
 function initBaseUrl() {
