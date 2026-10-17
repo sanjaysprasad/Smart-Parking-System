@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Parking Control Center</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="title-row">
+        <h1>🚗 Smart Parking Control</h1>
+        <div id="conn-status" class="status-pill pill-online">
+          <span class="dot"></span> <span id="conn-text">ONLINE</span>
+        </div>
+      </div>
+      <p class="subtitle">ESP32 Live Telemetry & Barrier Gate Remote</p>
+
+      <!-- Connection IP Bar for Standalone Mode -->
+      <div id="ip-config-bar" class="ip-bar">
+        <label for="esp-ip">Device IP:</label>
+        <input type="text" id="esp-ip" value="http://192.168.4.1" placeholder="http://192.168.4.1">
+        <button id="save-ip-btn" class="btn btn-secondary">Connect</button>
+      </div>
+    </header>
+
+    <!-- Parking Status Banner -->
+    <div id="banner" class="status-banner banner-ok">CHECKING SYSTEM...</div>
+
+    <!-- Live Metrics Grid -->
+    <div class="grid grid-3">
+      <div class="card metric-card">
+        <div class="label">Available</div>
+        <div id="avail" class="value val-avail">--</div>
+      </div>
+      <div class="card metric-card">
+        <div class="label">Occupied</div>
+        <div id="occ" class="value val-occ">--</div>
+      </div>
+      <div class="card metric-card">
+        <div class="label">Capacity</div>
+        <div id="total" class="value val-total">--</div>
+      </div>
+    </div>
+
+    <!-- Occupancy Progress Bar -->
+    <div class="card progress-card">
+      <div class="progress-header">
+        <span>Occupancy Ratio</span>
+        <span id="cap-text">0 / 20 Slots</span>
+      </div>
+      <div class="progress-track">
+        <div id="bar" class="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Web Remote Controls -->
+    <section class="section-title">Manual Gate Actuators</section>
+    
+    <div class="grid grid-2">
+      <!-- Entry Gate Control Card -->
+      <div class="card gate-card">
+        <div class="gate-header">
+          <h3>Entry Barrier</h3>
+          <span id="entry-badge" class="badge badge-closed">CLOSED</span>
+        </div>
+        <p class="gate-hint">GPIO 14 Servo (Sensor: GPIO 26)</p>
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="actuateGate('entry', 'pulse')">
+            🟢 Open (3s Pulse)
+          </button>
+          <div class="btn-subgroup">
+            <button class="btn btn-outline" onclick="actuateGate('entry', 'open')">Hold Open</button>
+            <button class="btn btn-outline btn-danger" onclick="actuateGate('entry', 'close')">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exit Gate Control Card -->
+      <div class="card gate-card">
+        <div class="gate-header">
+          <h3>Exit Barrier</h3>
+          <span id="exit-badge" class="badge badge-closed">CLOSED</span>
+        </div>
+        <p class="gate-hint">GPIO 13 Servo (Sensor: GPIO 25)</p>
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="actuateGate('exit', 'pulse')">
+            🟢 Open (3s Pulse)
+          </button>
+          <div class="btn-subgroup">
+            <button class="btn btn-outline" onclick="actuateGate('exit', 'open')">Hold Open</button>
+            <button class="btn btn-outline btn-danger" onclick="actuateGate('exit', 'close')">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot Overrides -->
+    <section class="section-title">Slot Counter Management</section>
+    <div class="card control-card">
+      <div class="button-row">
+        <button class="btn btn-secondary" onclick="adjustSlots('inc')">
+          ➕ Manual Entry (+1)
+        </button>
+        <button class="btn btn-secondary" onclick="adjustSlots('dec')">
+          ➖ Manual Exit (-1)
+        </button>
+        <button class="btn btn-danger" onclick="resetSlots()">
+          🔄 Reset All (0)
+        </button>
+      </div>
+    </div>
+
+    <!-- Event Log -->
+    <section class="section-title">Live System Logs</section>
+    <div class="card log-card">
+      <ul id="event-log">
+        <li class="log-entry">Waiting for connection...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

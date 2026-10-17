@@ -104,13 +104,37 @@ The ESP32 broadcasts its own Wi-Fi Access Point (SoftAP):
 - **Default Password:** `12345678`
 - **Default Web Dashboard URL:** `http://192.168.4.1`
 
-### Available HTTP Endpoints
+### Available HTTP Endpoints (Standard & Web Control)
 
 | Endpoint | Method | Response | Description |
 | :--- | :---: | :--- | :--- |
-| `/` | `GET` | `text/html` | Responsive dark-mode live dashboard |
+| `/` | `GET` | `text/html` | Responsive dark-mode live dashboard / controller |
 | `/status` | `GET` | `application/json` | JSON payload with total, occupied, available, and gate states |
+| `/api/gate/entry?action=pulse` | `GET` | `text/plain` | Open entry barrier with 3s auto-close timer *(Web Control)* |
+| `/api/gate/entry?action=open` | `GET` | `text/plain` | Hold entry barrier open indefinitely *(Web Control)* |
+| `/api/gate/entry?action=close` | `GET` | `text/plain` | Immediately close entry barrier *(Web Control)* |
+| `/api/gate/exit?action=pulse` | `GET` | `text/plain` | Open exit barrier with 3s auto-close timer *(Web Control)* |
+| `/api/gate/exit?action=open` | `GET` | `text/plain` | Hold exit barrier open indefinitely *(Web Control)* |
+| `/api/gate/exit?action=close` | `GET` | `text/plain` | Immediately close exit barrier *(Web Control)* |
+| `/api/slots?action=inc` | `GET` | `text/plain` | Manual vehicle entry override (+1 occupied) *(Web Control)* |
+| `/api/slots?action=dec` | `GET` | `text/plain` | Manual vehicle exit override (-1 occupied) *(Web Control)* |
 | `/reset` | `GET` | `text/plain` | Resets occupied count to 0 and syncs NVS flash |
+
+---
+
+## 🎮 Choosing Your Firmware Sketch
+
+The repository includes two versions:
+
+1. **[`SmartPark.ino`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark.ino) (Standard Automated Mode):**
+   - Autonomous IR sensing, auto-opening barrier servos, LCD updates, and read-only live web telemetry.
+   - Self-contained single-file sketch.
+
+2. **[`SmartPark_WebControl/`](file:///Users/ssp/Documents/Arduino/SmartPark/SmartPark_WebControl/SmartPark_WebControl.ino) (Interactive Web App & Control):**
+   - Adds full bidirectional remote control over Wi-Fi (Hold open, 3s Pulse, Close, and manual counter adjustments).
+   - Serves separated web files (`index.html`, `style.css`, `app.js`) from ESP32 **LittleFS** flash memory.
+   - Auto-formats and auto-seeds the web files on first boot if LittleFS is empty.
+   - Includes an IP configuration bar so the web app can also be opened standalone from any computer or browser and connect to `http://192.168.4.1`.
 
 ---
 
