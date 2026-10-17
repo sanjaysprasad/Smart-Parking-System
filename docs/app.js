@@ -17,6 +17,9 @@ const db = firebase.database();
 
 let lastStatus = null;
 
+// Default Admin Authentication PIN (Can be changed anytime)
+const ADMIN_PIN = "admin123";
+
 function logEvent(msg) {
   const logEl = document.getElementById("event-log");
   const time = new Date().toLocaleTimeString();
@@ -102,7 +105,7 @@ function listenToCloudParking() {
 }
 
 // ==========================================
-// SEND CLOUD ACTUATOR COMMANDS
+// PUBLIC BARRIER GATE COMMANDS
 // ==========================================
 function sendGateCommand(gate, action) {
   logEvent(`Cloud Command: ${gate.toUpperCase()} gate ➔ ${action.toUpperCase()}`);
@@ -115,8 +118,74 @@ function sendGateCommand(gate, action) {
     });
 }
 
+// ==========================================
+// ADMIN AUTHENTICATION & MANAGEMENT
+// ==========================================
+function openAdminModal() {
+  if (sessionStorage.getItem("smartpark_admin_auth") === "true") {
+    // Already logged in, toggle scroll to admin panel
+    const panel = document.getElementById("admin-panel");
+    panel.scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  document.getElementById("admin-pin-input").value = "";
+  document.getElementById("admin-err-msg").style.display = "none";
+  document.getElementById("admin-modal").style.display = "flex";
+  document.getElementById("admin-pin-input").focus();
+}
+
+function closeAdminModal() {
+  document.getElementById("admin-modal").style.display = "none";
+}
+
+function verifyAdminPin() {
+  const input = document.getElementById("admin-pin-input").value.trim();
+  if (input === ADMIN_PIN) {
+    sessionStorage.setItem("smartpark_admin_auth", "true");
+    closeAdminModal();
+    applyAdminState(true);
+    logEvent("Admin authentication successful");
+  } else {
+    document.getElementById("admin-err-msg").style.display = "block";
+  }
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem("smartpark_admin_auth");
+  applyAdminState(false);
+  logEvent("Admin session closed");
+}
+
+function applyAdminState(isAdmin) {
+  const panel = document.getElementById("admin-panel");
+  const btn = document.getElementById("admin-btn");
+  if (isAdmin) {
+    panel.style.display = "block";
+    btn.textContent = "🛡️ Admin Active";
+    btn.className = "btn btn-sm btn-primary";
+  } else {
+    panel.style.display = "none";
+    btn.textContent = "🔒 Admin";
+    btn.className = "btn btn-sm btn-outline";
+  }
+}
+
+// Check PIN on Enter key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.getElementById("admin-modal").style.display === "flex") {
+    verifyAdminPin();
+  }
+});
+
+// ==========================================
+// ADMIN-ONLY COMMANDS
+// ==========================================
 function sendSlotCommand(action) {
-  logEvent(`Cloud slot adjustment: ${action}`);
+  if (sessionStorage.getItem("smartpark_admin_auth") !== "true") {
+    alert("Admin access required.");
+    return;
+  }
+  logEvent(`Admin action: Slot adjustment (${action})`);
   db.ref("commands/slots").set(action)
     .then(() => {
       logEvent(`Dispatched slot command: ${action}`);
@@ -127,11 +196,15 @@ function sendSlotCommand(action) {
 }
 
 function resetSlots() {
+  if (sessionStorage.getItem("smartpark_admin_auth") !== "true") {
+    alert("Admin access required.");
+    return;
+  }
   if (!confirm("Are you sure you want to reset all parking slots to 0 occupied?")) return;
-  logEvent("Dispatched reset command to Firebase Cloud...");
+  logEvent("Admin action: Dispatched master reset to Firebase Cloud");
   db.ref("commands/reset").set(true)
     .then(() => {
-      logEvent("Reset command queued in Cloud");
+      logEvent("Master reset command queued in Cloud");
     })
     .catch((err) => {
       logEvent(`Error resetting: ${err.message}`);
@@ -142,4 +215,8 @@ function resetSlots() {
 document.addEventListener("DOMContentLoaded", () => {
   logEvent("Initializing Cloud IoT Dashboard...");
   listenToCloudParking();
+
+  // Restore admin state if already authenticated in this session
+  const isAuth = (sessionStorage.getItem("smartpark_admin_auth") === "true");
+  applyAdminState(isAuth);
 });

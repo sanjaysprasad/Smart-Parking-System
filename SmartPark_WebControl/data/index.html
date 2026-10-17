@@ -12,8 +12,13 @@
     <header>
       <div class="title-row">
         <h1>🚗 Smart Parking Control</h1>
-        <div id="conn-status" class="status-pill pill-online">
-          <span class="dot"></span> <span id="conn-text">ONLINE</span>
+        <div class="header-badges">
+          <div id="conn-status" class="status-pill pill-online">
+            <span class="dot"></span> <span id="conn-text">ONLINE</span>
+          </div>
+          <button id="admin-btn" class="btn btn-sm btn-outline" onclick="openAdminModal()">
+            🔒 Admin
+          </button>
         </div>
       </div>
       <p class="subtitle">ESP32 Live Telemetry & Barrier Gate Remote</p>
@@ -56,8 +61,8 @@
       </div>
     </div>
 
-    <!-- Web Remote Controls -->
-    <section class="section-title">Manual Gate Actuators</section>
+    <!-- Web Remote Controls (Available to All Users) -->
+    <section class="section-title">Barrier Gate Remote</section>
     
     <div class="grid grid-2">
       <!-- Entry Gate Control Card -->
@@ -97,19 +102,25 @@
       </div>
     </div>
 
-    <!-- Slot Overrides -->
-    <section class="section-title">Slot Counter Management</section>
-    <div class="card control-card">
-      <div class="button-row">
-        <button class="btn btn-secondary" onclick="adjustSlots('inc')">
-          ➕ Manual Entry (+1)
-        </button>
-        <button class="btn btn-secondary" onclick="adjustSlots('dec')">
-          ➖ Manual Exit (-1)
-        </button>
-        <button class="btn btn-danger" onclick="resetSlots()">
-          🔄 Reset All (0)
-        </button>
+    <!-- ADMIN ONLY PANEL (Hidden by default) -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+      <div class="admin-header">
+        <span class="admin-tag">🛡️ ADMIN PORTAL ACTIVE</span>
+        <button class="btn btn-xs btn-outline" onclick="logoutAdmin()">Lock / Logout</button>
+      </div>
+      <div class="card admin-card">
+        <p class="admin-desc">Manual Slot Overrides & Master Reset</p>
+        <div class="button-row">
+          <button class="btn btn-secondary" onclick="adjustSlots('inc')">
+            ➕ Manual Entry (+1)
+          </button>
+          <button class="btn btn-secondary" onclick="adjustSlots('dec')">
+            ➖ Manual Exit (-1)
+          </button>
+          <button class="btn btn-danger" onclick="resetSlots()">
+            🔄 Reset All (0)
+          </button>
+        </div>
       </div>
     </div>
 
@@ -119,6 +130,20 @@
       <ul id="event-log">
         <li class="log-entry">Waiting for connection...</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- Admin PIN Modal Dialog -->
+  <div id="admin-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3>🛡️ Administrator Authentication</h3>
+      <p class="modal-subtitle">Enter admin PIN to unlock slot adjustment and system reset:</p>
+      <input type="password" id="admin-pin-input" placeholder="Enter PIN (Default: admin123)" autocomplete="current-password">
+      <p id="admin-err-msg" class="err-text" style="display: none;">Incorrect PIN. Try again.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="verifyAdminPin()">Unlock</button>
+      </div>
     </div>
   </div>
 

@@ -6,7 +6,7 @@
   <title>Smart Parking Cloud IoT Hub</title>
   <link rel="stylesheet" href="style.css">
   
-  <!-- Firebase App & Realtime Database SDKs (Compat for maximum reliability) -->
+  <!-- Firebase App & Realtime Database SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
@@ -16,11 +16,16 @@
     <header>
       <div class="title-row">
         <h1>☁️ Smart Parking Cloud Hub</h1>
-        <div id="cloud-pill" class="status-pill pill-online">
-          <span class="dot"></span> <span id="cloud-text">CONNECTING...</span>
+        <div class="header-badges">
+          <div id="cloud-pill" class="status-pill pill-online">
+            <span class="dot"></span> <span id="cloud-text">CONNECTING...</span>
+          </div>
+          <button id="admin-btn" class="btn btn-sm btn-outline" onclick="openAdminModal()">
+            🔒 Admin
+          </button>
         </div>
       </div>
-      <p class="subtitle">Real-time Global IoT Telemetry & Barrier Gate Remote</p>
+      <p class="subtitle">Live Global Telemetry & Barrier Remote</p>
     </header>
 
     <!-- Parking Status Banner -->
@@ -53,8 +58,8 @@
       </div>
     </div>
 
-    <!-- Cloud Gate Actuators -->
-    <section class="section-title">Cloud Barrier Gate Remote</section>
+    <!-- Public Barrier Gate Remote -->
+    <section class="section-title">Barrier Gate Remote</section>
     
     <div class="grid grid-2">
       <!-- Entry Gate Card -->
@@ -63,7 +68,7 @@
           <h3>Entry Barrier</h3>
           <span id="entry-badge" class="badge badge-closed">CLOSED</span>
         </div>
-        <p class="gate-hint">Actuates ESP32 GPIO 14 via Cloud</p>
+        <p class="gate-hint">Entry Gate Servo (GPIO 14)</p>
         <div class="button-group">
           <button class="btn btn-primary" onclick="sendGateCommand('entry', 'pulse')">
             🟢 Open (3s Auto-Close)
@@ -81,7 +86,7 @@
           <h3>Exit Barrier</h3>
           <span id="exit-badge" class="badge badge-closed">CLOSED</span>
         </div>
-        <p class="gate-hint">Actuates ESP32 GPIO 13 via Cloud</p>
+        <p class="gate-hint">Exit Gate Servo (GPIO 13)</p>
         <div class="button-group">
           <button class="btn btn-primary" onclick="sendGateCommand('exit', 'pulse')">
             🟢 Open (3s Auto-Close)
@@ -94,19 +99,25 @@
       </div>
     </div>
 
-    <!-- Manual Counter Adjustments -->
-    <section class="section-title">Manual Slot Overrides</section>
-    <div class="card control-card">
-      <div class="button-row">
-        <button class="btn btn-secondary" onclick="sendSlotCommand('inc')">
-          ➕ Manual Entry (+1)
-        </button>
-        <button class="btn btn-secondary" onclick="sendSlotCommand('dec')">
-          ➖ Manual Exit (-1)
-        </button>
-        <button class="btn btn-danger" onclick="resetSlots()">
-          🔄 Reset All (0)
-        </button>
+    <!-- ADMIN ONLY SECTION (Hidden by default, unlocked with PIN) -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+      <div class="admin-header">
+        <span class="admin-tag">🛡️ ADMIN PORTAL ACTIVE</span>
+        <button class="btn btn-xs btn-outline" onclick="logoutAdmin()">Lock / Logout</button>
+      </div>
+      <div class="card admin-card">
+        <p class="admin-desc">Manual Slot Overrides & Master Reset</p>
+        <div class="button-row">
+          <button class="btn btn-secondary" onclick="sendSlotCommand('inc')">
+            ➕ Manual Entry (+1)
+          </button>
+          <button class="btn btn-secondary" onclick="sendSlotCommand('dec')">
+            ➖ Manual Exit (-1)
+          </button>
+          <button class="btn btn-danger" onclick="resetSlots()">
+            🔄 Reset All (0)
+          </button>
+        </div>
       </div>
     </div>
 
@@ -116,6 +127,20 @@
       <ul id="event-log">
         <li class="log-entry">Connecting to Firebase Realtime Cloud...</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- Admin PIN Modal Dialog -->
+  <div id="admin-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3>🛡️ Administrator Authentication</h3>
+      <p class="modal-subtitle">Enter admin PIN to unlock slot adjustment and system reset:</p>
+      <input type="password" id="admin-pin-input" placeholder="Enter PIN (Default: admin123)" autocomplete="current-password">
+      <p id="admin-err-msg" class="err-text" style="display: none;">Incorrect PIN. Try again.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="verifyAdminPin()">Unlock</button>
+      </div>
     </div>
   </div>
 

@@ -3,6 +3,9 @@ let baseUrl = "";
 let lastStatus = null;
 let pollTimer = null;
 
+// Default Admin Authentication PIN (Can be changed anytime)
+const ADMIN_PIN = "admin123";
+
 // Determine if running standalone or directly from ESP32
 function initBaseUrl() {
   const isLocalFile = window.location.protocol === "file:";
@@ -43,7 +46,6 @@ function logEvent(msg) {
   li.textContent = `[${time}] ${msg}`;
   logEl.insertBefore(li, logEl.firstChild);
 
-  // Keep max 20 log items
   while (logEl.children.length > 20) {
     logEl.removeChild(logEl.lastChild);
   }
@@ -58,7 +60,6 @@ async function fetchStatus() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    // Set online
     connPill.className = "status-pill pill-online";
     connText.textContent = "ONLINE";
 
@@ -87,7 +88,6 @@ async function fetchStatus() {
     exitBadge.textContent = data.exitOpen ? "OPEN" : "CLOSED";
     exitBadge.className = "badge " + (data.exitOpen ? "badge-open" : "badge-closed");
 
-    // Detect state changes for log
     if (lastStatus) {
       if (!lastStatus.entryOpen && data.entryOpen) logEvent("Entry barrier raised");
       if (lastStatus.entryOpen && !data.entryOpen) logEvent("Entry barrier lowered");
@@ -106,6 +106,9 @@ async function fetchStatus() {
   }
 }
 
+// ==========================================
+// PUBLIC BARRIER GATE CONTROLS
+// ==========================================
 async function actuateGate(gate, action) {
   logEvent(`Command: ${gate.toUpperCase()} gate -> ${action.toUpperCase()}`);
   try {
@@ -118,8 +121,72 @@ async function actuateGate(gate, action) {
   }
 }
 
+// ==========================================
+// ADMIN AUTHENTICATION
+// ==========================================
+function openAdminModal() {
+  if (sessionStorage.getItem("smartpark_admin_auth") === "true") {
+    const panel = document.getElementById("admin-panel");
+    panel.scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  document.getElementById("admin-pin-input").value = "";
+  document.getElementById("admin-err-msg").style.display = "none";
+  document.getElementById("admin-modal").style.display = "flex";
+  document.getElementById("admin-pin-input").focus();
+}
+
+function closeAdminModal() {
+  document.getElementById("admin-modal").style.display = "none";
+}
+
+function verifyAdminPin() {
+  const input = document.getElementById("admin-pin-input").value.trim();
+  if (input === ADMIN_PIN) {
+    sessionStorage.setItem("smartpark_admin_auth", "true");
+    closeAdminModal();
+    applyAdminState(true);
+    logEvent("Admin authentication successful");
+  } else {
+    document.getElementById("admin-err-msg").style.display = "block";
+  }
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem("smartpark_admin_auth");
+  applyAdminState(false);
+  logEvent("Admin session closed");
+}
+
+function applyAdminState(isAdmin) {
+  const panel = document.getElementById("admin-panel");
+  const btn = document.getElementById("admin-btn");
+  if (isAdmin) {
+    panel.style.display = "block";
+    btn.textContent = "🛡️ Admin Active";
+    btn.className = "btn btn-sm btn-primary";
+  } else {
+    panel.style.display = "none";
+    btn.textContent = "🔒 Admin";
+    btn.className = "btn btn-sm btn-outline";
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.getElementById("admin-modal").style.display === "flex") {
+    verifyAdminPin();
+  }
+});
+
+// ==========================================
+// ADMIN-ONLY COMMANDS
+// ==========================================
 async function adjustSlots(action) {
-  logEvent(`Slot count adjustment: ${action}`);
+  if (sessionStorage.getItem("smartpark_admin_auth") !== "true") {
+    alert("Admin access required.");
+    return;
+  }
+  logEvent(`Admin action: Slot count adjustment (${action})`);
   try {
     const res = await fetch(`${baseUrl}/api/slots?action=${action}`, { cache: "no-store" });
     const text = await res.text();
@@ -131,8 +198,12 @@ async function adjustSlots(action) {
 }
 
 async function resetSlots() {
+  if (sessionStorage.getItem("smartpark_admin_auth") !== "true") {
+    alert("Admin access required.");
+    return;
+  }
   if (!confirm("Are you sure you want to reset all slots to 0 occupied?")) return;
-  logEvent("Resetting parking slots to 0...");
+  logEvent("Admin action: Resetting parking slots to 0...");
   try {
     const res = await fetch(`${baseUrl}/reset`, { cache: "no-store" });
     const text = await res.text();
@@ -149,4 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
   logEvent("Web Controller initialized");
   fetchStatus();
   pollTimer = setInterval(fetchStatus, 1000);
+
+  const isAuth = (sessionStorage.getItem("smartpark_admin_auth") === "true");
+  applyAdminState(isAuth);
 });

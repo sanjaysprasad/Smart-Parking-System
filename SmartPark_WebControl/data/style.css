@@ -12,6 +12,8 @@
   --amber-glow: rgba(245, 158, 11, 0.2);
   --blue: #38bdf8;
   --blue-hover: #0284c7;
+  --purple: #a855f7;
+  --purple-glow: rgba(168, 85, 247, 0.2);
 }
 
 * {
@@ -47,14 +49,20 @@ header {
 }
 
 h1 {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.3px;
 }
 
 .subtitle {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--muted);
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .status-pill {
@@ -63,7 +71,7 @@ h1 {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -295,6 +303,16 @@ h1 {
   transform: scale(0.97);
 }
 
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.75rem;
+}
+
+.btn-xs {
+  padding: 3px 8px;
+  font-size: 0.7rem;
+}
+
 .btn-primary {
   background: var(--blue);
   color: #0f172a;
@@ -332,6 +350,115 @@ h1 {
 
 .btn-danger:hover {
   background: var(--red-glow);
+}
+
+/* ============================
+   ADMIN SECTION STYLES
+   ============================ */
+.admin-panel {
+  margin-top: 18px;
+  margin-bottom: 16px;
+  border: 1px dashed var(--purple);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(168, 85, 247, 0.05);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.admin-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--purple);
+  letter-spacing: 0.5px;
+}
+
+.admin-card {
+  background: #141629;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 12px;
+}
+
+.admin-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* ============================
+   MODAL DIALOG STYLES
+   ============================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: var(--card-bg);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 360px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.modal-box h3 {
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #090d16;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  text-align: center;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.modal-box input:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.err-text {
+  color: var(--red);
+  font-size: 0.75rem;
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .log-card {
