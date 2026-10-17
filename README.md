@@ -158,6 +158,28 @@ The cloud dashboard in the [`docs/`](file:///Users/ssp/Documents/Arduino/SmartPa
 
 ---
 
+## 💻 Terminal Controller CLI (`smartpark.py`)
+
+Control and monitor your smart parking system directly from your macOS terminal using the built-in CLI:
+
+```bash
+# Launch the interactive menu
+python3 smartpark.py
+
+# Or run one-liner commands
+python3 smartpark.py status                 # Show live ASCII status table
+python3 smartpark.py watch                  # Auto-refreshing live terminal dashboard
+python3 smartpark.py entry pulse            # Open entry gate (3s pulse)
+python3 smartpark.py entry open             # Hold entry gate open
+python3 smartpark.py entry close            # Close entry gate
+python3 smartpark.py exit pulse             # Open exit gate (3s pulse)
+python3 smartpark.py inc                    # Add vehicle (+1)
+python3 smartpark.py dec                    # Remove vehicle (-1)
+python3 smartpark.py reset                  # Reset all slots to 0
+```
+
+---
+
 ## ⚙️ Software Setup & Installation
 
 ### 1. Arduino IDE Setup
