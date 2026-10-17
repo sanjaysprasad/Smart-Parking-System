@@ -17,8 +17,8 @@ const db = firebase.database();
 
 let lastStatus = null;
 
-// Default Admin Authentication PIN (Can be changed anytime)
-const ADMIN_PIN = "admin123";
+// Admin Authentication Password
+const ADMIN_PIN = "admin@marichinthikuka";
 
 function logEvent(msg) {
   const logEl = document.getElementById("event-log");
